@@ -37,16 +37,17 @@ export default function FilterMoviesCard(props) {
           // eslint-disable-next-line
       }, []);
     
-      const handleChange = (e, type, value) => {
-        e.preventDefault()
-        // Completed later
-      };
+      
       const handleTextChange = e => {
         handleChange(e, "name", e.target.value)
       }
       const handleGenreChange = e => {
         handleChange(e, "genre", e.target.value)
       };
+      const handleChange = (e, type, value) => {
+        e.preventDefault()
+        props.onUserInput(type, value)   // NEW
+      }
   return (
     <Card 
       sx={{
@@ -59,18 +60,23 @@ export default function FilterMoviesCard(props) {
           Filter the movies.
         </Typography>
         <TextField
-          sx={{...formControl}}
-          id="filled-search"
-          label="Search field"
-          type="search"
-          variant="filled"
-        />
+      sx={{...formControl}}
+      id="filled-search"
+      label="Search field"
+      type="search"
+      variant="filled"
+      value={props.titleFilter}
+      onChange={handleTextChange}
+    />
         <FormControl sx={{...formControl}}>
           <InputLabel id="genre-label">Genre</InputLabel>
           <Select
-            labelId="genre-label"
-            id="genre-select"
-          >
+    labelId="genre-label"
+    id="genre-select"
+    defaultValue=""
+    value={props.genreFilter}
+    onChange={handleGenreChange}
+  >
             {genres.map((genre) => {
               return (
                 <MenuItem key={genre.id} value={genre.id}>
