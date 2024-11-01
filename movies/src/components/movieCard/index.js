@@ -1,4 +1,4 @@
-import React from "react";
+
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -14,11 +14,20 @@ import Grid from "@mui/material/Grid2";
 import img from '../../images/film-poster-placeholder.png'
 import { Link } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
-export default function MovieCard(props) {
-  const movie = props.movie;
+import React, { useContext  } from "react";
+import { MoviesContext } from "../../contexts/moviesContext";
+export default function MovieCard({ movie }) { 
+  const { favorites, addToFavorites } = useContext(MoviesContext);
+
+  if (favorites.find((id) => id === movie.id)) {
+    movie.favorite = true;
+  } else {
+    movie.favorite = false
+  }
+
   const handleAddToFavorite = (e) => {
     e.preventDefault();
-    props.selectFavorite(movie.id);
+    addToFavorites(movie);
   };
   return (
     <Card>
@@ -59,6 +68,17 @@ export default function MovieCard(props) {
             </Typography>
           </Grid>
         </Grid>
+        {movie.production_countries && movie.production_countries.length > 0 && (
+          <Typography variant="body2" color="textSecondary" component="div" sx={{ mt: 2 }}>
+            <strong>Production_countries:</strong>{" "}
+            {movie.production_countries.map((country, index) => (
+              <span key={index}>
+                {country}
+                {index < movie.production_countries.length - 1 ? ", " : ""}
+              </span>
+            ))}
+          </Typography>
+        )}
       </CardContent>
       <CardActions disableSpacing>
       <IconButton aria-label="add to favorites" onClick={handleAddToFavorite}>
