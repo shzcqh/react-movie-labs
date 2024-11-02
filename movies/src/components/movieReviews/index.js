@@ -1,4 +1,4 @@
-import React, { useEffect, useState }  from "react";
+import React  from "react";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";
@@ -11,6 +11,7 @@ import { getMovieReviews } from "../../api/tmdb-api";
 import { excerpt } from "../../util";
 import { useQuery } from "react-query";
 import Spinner from '../spinner'
+
 export default function MovieReviews({ movie }) {
   const { data , error, isLoading, isError } = useQuery(
     ["reviews", { id: movie.id }],

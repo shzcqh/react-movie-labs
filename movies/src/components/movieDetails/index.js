@@ -8,7 +8,8 @@ import NavigationIcon from "@mui/icons-material/Navigation";
 import Fab from "@mui/material/Fab";
 import Typography from "@mui/material/Typography";
 import Drawer from "@mui/material/Drawer";
-import MovieReviews from "../movieReviews"
+import MovieReviews from "../movieReviews";
+
 
 const root = {
     display: "flex",
@@ -21,7 +22,7 @@ const root = {
 const chip = { margin: 0.5 };
 
 const MovieDetails = ({ movie }) => {  // Don't miss this!
-    const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   return (
     <>
@@ -58,19 +59,21 @@ const MovieDetails = ({ movie }) => {  // Don't miss this!
         />
         <Chip label={`Released: ${movie.release_date}`} />
       </Paper>
+
       {movie.production_countries && movie.production_countries.length > 0 && (
-        <Paper component="ul" sx={{ ...root }}>
+        <Paper component="ul" sx={{...root}}>
           <li>
-            <Chip label="Production Countries" sx={{ ...chip }} color="primary" />
+            <Chip label="Production Countries" sx={{...chip}} color="primary" />
           </li>
           {movie.production_countries.map((country, index) => (
-            <li key={country.name}>
-              <Chip label={country.name} sx={{ ...chip }} />
+            <li key={index}>
+              <Chip label={country.name} sx={{...chip}} />
             </li>
           ))}
         </Paper>
       )}
-      <Fab
+
+       <Fab
         color="secondary"
         variant="extended"
         onClick={() =>setDrawerOpen(true)}
