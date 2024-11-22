@@ -9,6 +9,9 @@ import Fab from "@mui/material/Fab";
 import Typography from "@mui/material/Typography";
 import Drawer from "@mui/material/Drawer";
 import MovieReviews from "../movieReviews";
+import { useQuery } from "react-query";
+import { getMovieReviews } from "../../api/tmdb-api";  
+ 
 
 
 const root = {
@@ -23,7 +26,10 @@ const chip = { margin: 0.5 };
 
 const MovieDetails = ({ movie }) => {  // Don't miss this!
   const [drawerOpen, setDrawerOpen] = useState(false);
-
+  const { data: reviews, error, isLoading } = useQuery([
+    'movieReviews',
+    { id: movie.id }
+  ], getMovieReviews);
   return (
     <>
       <Typography variant="h5" component="h3">
@@ -85,9 +91,12 @@ const MovieDetails = ({ movie }) => {  // Don't miss this!
       >
         <NavigationIcon />
         Reviews
-      </Fab>
+        </Fab>
       <Drawer anchor="top" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
-        <MovieReviews movie={movie} />
+        {/* Display loading, error, or reviews based on the query state */}
+        {isLoading && <Typography>Loading reviews...</Typography>}
+        {error && <Typography>Error: {error.message}</Typography>}
+        {reviews && <MovieReviews reviews={reviews.results} />}
       </Drawer>
       </>
   );

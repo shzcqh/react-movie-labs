@@ -1,4 +1,4 @@
-import React, { useContext  } from "react";
+import React, { useContext } from "react";
 import Card from "@mui/material/Card";
 import CardActions from "@mui/material/CardActions";
 import CardContent from "@mui/material/CardContent";
@@ -15,26 +15,54 @@ import img from '../../images/film-poster-placeholder.png';
 import { Link } from "react-router-dom";
 import Avatar from '@mui/material/Avatar';
 import { MoviesContext } from "../../contexts/moviesContext";
+import { useQuery } from 'react-query';
+import { getMovie } from '../../api/tmdb-api';
 
 export default function MovieCard({ movie, action }) {
-  const { favorites, addToFavorites } = useContext(MoviesContext);
+  const { favorites, addToFavorites, removeFromFavorites, mustWatch, addToMustWatch, removeFromMustWatch } = useContext(MoviesContext);
 
-  if (favorites.find((id) => id === movie.id)) {
-    movie.favorite = true;
-  } else {
-    movie.favorite = false
-  }
+  // Determine if the movie is in favorites
+  const isFavorite = favorites.includes(movie.id);
+
+  // Determine if the movie is in must-watch list
+  const isInMustWatch = mustWatch.includes(movie.id);
 
   const handleAddToFavorite = (e) => {
     e.preventDefault();
-    addToFavorites(movie);
+    if (isFavorite) {
+      removeFromFavorites(movie);
+    } else {
+      addToFavorites(movie);
+    }
   };
-  
+
+  const handleAddToMustWatch = (e) => {
+    e.preventDefault();
+    if (isInMustWatch) {
+      removeFromMustWatch(movie);
+    } else {
+      addToMustWatch(movie);
+    }
+  };
+
+  const { data: movieDetails, error, isLoading } = useQuery([
+    'movie',
+    { id: movie.id }
+  ], getMovie);
+
+  if (isLoading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography>Error: {error.message}</Typography>;
+  }
+
   return (
     <Card>
-     <CardHeader
+      <CardHeader
         avatar={
-          movie.favorite ? (
+          isFavorite ? (
             <Avatar sx={{ backgroundColor: 'red' }}>
               <FavoriteIcon />
             </Avatar>
@@ -56,13 +84,13 @@ export default function MovieCard({ movie, action }) {
       />
       <CardContent>
         <Grid container>
-          <Grid size={{xs: 6}}>
+          <Grid item xs={6}>
             <Typography variant="h6" component="p">
               <CalendarIcon fontSize="small" />
               {movie.release_date}
             </Typography>
           </Grid>
-          <Grid size={{xs: 6}}>
+          <Grid item xs={6}>
             <Typography variant="h6" component="p">
               <StarRateIcon fontSize="small" />
               {"  "} {movie.vote_average}{" "}
@@ -71,16 +99,22 @@ export default function MovieCard({ movie, action }) {
         </Grid>
       </CardContent>
       <CardActions disableSpacing>
-      
-      {action(movie)}
-    
-      <Link to={`/movies/${movie.id}`}>
-        <Button variant="outlined" size="medium" color="primary">
-          More Info ...
+        <IconButton onClick={handleAddToFavorite}>
+          <FavoriteIcon color={isFavorite ? "error" : "disabled"} />
+        </IconButton>
+        <Button
+          variant={isInMustWatch ? "contained" : "outlined"}
+          color="secondary"
+          onClick={handleAddToMustWatch}
+        >
+          {isInMustWatch ? "Remove from Must-Watch" : "Add to Must-Watch"}
         </Button>
-      </Link>
-      
-    </CardActions>
+        <Link to={`/movies/${movie.id}`}>
+          <Button variant="outlined" size="medium" color="primary">
+            More Info ...
+          </Button>
+        </Link>
+      </CardActions>
     </Card>
   );
 }
