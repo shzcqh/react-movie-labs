@@ -115,4 +115,4 @@ export const getMovie = (args) => {
     .catch((error) => {
       throw error
    });
-  };
+  }
