@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { getTrendingMovies, getPopularMovies } from "../api/tmdb-api";
 import PageTemplate from '../components/templateMovieListPage';
 import Spinner from '../components/spinner';
@@ -13,14 +14,12 @@ const HomePage = (props) => {
   useEffect(() => {
     const fetchMovies = async () => {
       try {
-        
         const trending = await getTrendingMovies();
         setTrendingMovies(trending.results);
 
-        
         const popular = await getPopularMovies();
         setPopularMovies(popular.results);
-        
+
         setLoading(false);
       } catch (err) {
         setError(err.message);
@@ -44,14 +43,28 @@ const HomePage = (props) => {
         title="Trending Movies"
         movies={trendingMovies}
         action={(movie) => {
-          return <AddToFavoritesIcon movie={movie} />;
+          return (
+            <>
+              <AddToFavoritesIcon movie={movie} />
+              <Link to={`/movies/${movie.id}`}>
+                <button>View Details</button>
+              </Link>
+            </>
+          );
         }}
       />
       <PageTemplate
         title="Popular Movies"
         movies={popularMovies}
         action={(movie) => {
-          return <AddToFavoritesIcon movie={movie} />;
+          return (
+            <>
+              <AddToFavoritesIcon movie={movie} />
+              <Link to={`/movies/${movie.id}`}>
+                <button>View Details</button>
+              </Link>
+            </>
+          );
         }}
       />
     </>
