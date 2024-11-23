@@ -116,3 +116,34 @@ export const getMovie = (args) => {
       throw error
    });
   }
+// Get trending movies
+export const getTrendingMovies = async () => {
+  return fetch(
+    `https://api.themoviedb.org/3/trending/movie/week?api_key=${process.env.REACT_APP_TMDB_KEY}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.json().message);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
+// Get the most popular movies
+export const getPopularMovies = async () => {
+  return fetch(
+    `https://api.themoviedb.org/3/movie/popular?api_key=${process.env.REACT_APP_TMDB_KEY}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.json().message);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
