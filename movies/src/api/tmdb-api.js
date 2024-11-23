@@ -177,3 +177,19 @@ export const getMovieCredits = async (movieId) => {
       throw error;
     });
 };
+
+// 根据类型获取电影
+export const getMoviesByGenre = async (genreId) => {
+  return fetch(
+    `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_KEY}&with_genres=${genreId}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.json().message);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};

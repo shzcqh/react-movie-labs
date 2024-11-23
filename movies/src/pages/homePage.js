@@ -1,25 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getTrendingMovies, getPopularMovies } from "../api/tmdb-api";
 import PageTemplate from '../components/templateMovieListPage';
 import Spinner from '../components/spinner';
 import AddToFavoritesIcon from '../components/cardIcons/addToFavorites';
+import {  getGenres, getMoviesByGenre } from "../api/tmdb-api";
 
 const HomePage = (props) => {
-  // 使用 React Query 获取 Trending Movies 数据
-  const { data: trendingMoviesData, error: trendingError, isLoading: isTrendingLoading } = useQuery(
-    'trendingMovies',
-    getTrendingMovies
+  const [selectedGenre, setSelectedGenre] = useState(""); 
+
+  
+  const { data: genresData, isLoading: isGenresLoading } = useQuery('genres', getGenres);
+
+  
+  const { data: trendingMoviesData, error: trendingError, isLoading: isTrendingLoading } = useQuery('trendingMovies', getTrendingMovies);
+
+  
+  const { data: filteredMoviesData, isLoading: isFilteredLoading } = useQuery(
+    ['moviesByGenre', selectedGenre],
+    () => getMoviesByGenre(selectedGenre),
+    {
+      enabled: !!selectedGenre, 
+    }
   );
 
-  // 使用 React Query 获取 Popular Movies 数据
-  const { data: popularMoviesData, error: popularError, isLoading: isPopularLoading } = useQuery(
-    'popularMovies',
-    getPopularMovies
-  );
-
-  if (isTrendingLoading || isPopularLoading) {
+  if (isTrendingLoading || isGenresLoading || (selectedGenre && isFilteredLoading)) {
     return <Spinner />;
   }
 
@@ -27,32 +33,29 @@ const HomePage = (props) => {
     return <h1>{trendingError.message}</h1>;
   }
 
-  if (popularError) {
-    return <h1>{popularError.message}</h1>;
-  }
-
-  const trendingMovies = trendingMoviesData.results;
-  const popularMovies = popularMoviesData.results;
+  const genres = genresData?.genres || [];
+  const trendingMovies = trendingMoviesData?.results || [];
+  const filteredMovies = filteredMoviesData?.results || [];
 
   return (
     <>
+      <h2>Filter by Genre</h2>
+      <select
+        value={selectedGenre}
+        onChange={(e) => setSelectedGenre(e.target.value)}
+      >
+        <option value="">All Genres</option>
+        {genres.map((genre) => (
+          <option key={genre.id} value={genre.id}>
+            {genre.name}
+          </option>
+        ))}
+      </select>
+
+      {/* Displays Trending Movies or movies filtered by genre */}
       <PageTemplate
-        title="Trending Movies"
-        movies={trendingMovies}
-        action={(movie) => {
-          return (
-            <>
-              <AddToFavoritesIcon movie={movie} />
-              <Link to={`/movies/${movie.id}`}>
-                <button>View Details</button>
-              </Link>
-            </>
-          );
-        }}
-      />
-      <PageTemplate
-        title="Popular Movies"
-        movies={popularMovies}
+        title={selectedGenre ? "Filtered Movies" : "Trending Movies"}
+        movies={selectedGenre ? filteredMovies : trendingMovies}
         action={(movie) => {
           return (
             <>
