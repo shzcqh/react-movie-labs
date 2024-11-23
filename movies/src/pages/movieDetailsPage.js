@@ -1,62 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { useParams } from 'react-router-dom';
+import { useQuery } from 'react-query';
 import MovieDetails from '../components/movieDetails/';
 import PageTemplate from '../components/templateMoviePage';
 import { getMovie, getMovieRecommendations, getMovieCredits } from '../api/tmdb-api';
-import { useQuery } from 'react-query';
 import Spinner from '../components/spinner';
 
 const MoviePage = (props) => {
   const { id } = useParams();
-  const { data: movie, error, isLoading, isError } = useQuery(
-    ['movie', { id: id }],
-    getMovie
+
+  // 使用 React Query 获取电影详情
+  const { data: movie, error: movieError, isLoading: movieLoading } = useQuery(
+    ['movie', { id }],
+    () => getMovie({ queryKey: [null, { id }] })
   );
 
-  const [recommendations, setRecommendations] = useState([]);
-  const [loadingRecommendations, setLoadingRecommendations] = useState(true);
-  const [recommendationError, setRecommendationError] = useState(null);
+  // 使用 React Query 获取推荐电影
+  const { data: recommendations, error: recommendationError, isLoading: recommendationLoading } = useQuery(
+    ['movieRecommendations', { id }],
+    () => getMovieRecommendations(id)
+  );
 
-  const [credits, setCredits] = useState([]);
-  const [loadingCredits, setLoadingCredits] = useState(true);
-  const [creditsError, setCreditsError] = useState(null);
+  // 使用 React Query 获取演员信息
+  const { data: credits, error: creditsError, isLoading: creditsLoading } = useQuery(
+    ['movieCredits', { id }],
+    () => getMovieCredits(id)
+  );
 
-  // 获取推荐电影
-  useEffect(() => {
-    const fetchRecommendations = async () => {
-      try {
-        const data = await getMovieRecommendations(id);
-        setRecommendations(data.results);
-        setLoadingRecommendations(false);
-      } catch (err) {
-        setRecommendationError(err.message);
-        setLoadingRecommendations(false);
-      }
-    };
-    fetchRecommendations();
-  }, [id]);
-
-  // 获取演员信息
-  useEffect(() => {
-    const fetchCredits = async () => {
-      try {
-        const data = await getMovieCredits(id);
-        setCredits(data.cast);
-        setLoadingCredits(false);
-      } catch (err) {
-        setCreditsError(err.message);
-        setLoadingCredits(false);
-      }
-    };
-    fetchCredits();
-  }, [id]);
-
-  if (isLoading) {
+  if (movieLoading || recommendationLoading || creditsLoading) {
     return <Spinner />;
   }
 
-  if (isError) {
-    return <h1>{error.message}</h1>;
+  if (movieError) {
+    return <h1>{movieError.message}</h1>;
+  }
+
+  if (recommendationError) {
+    return <h4>{recommendationError}</h4>;
+  }
+
+  if (creditsError) {
+    return <h4>{creditsError}</h4>;
   }
 
   return (
@@ -68,30 +52,20 @@ const MoviePage = (props) => {
           </PageTemplate>
           
           <h3>Recommended Movies</h3>
-          {loadingRecommendations ? (
-            <Spinner />
-          ) : recommendationError ? (
-            <h4>{recommendationError}</h4>
-          ) : (
-            <ul>
-              {recommendations.map((recMovie) => (
-                <li key={recMovie.id}>{recMovie.title}</li>
-              ))}
-            </ul>
-          )}
+          <ul>
+            {recommendations.results.map((recMovie) => (
+              <li key={recMovie.id}>{recMovie.title}</li>
+            ))}
+          </ul>
 
           <h3>Cast</h3>
-          {loadingCredits ? (
-            <Spinner />
-          ) : creditsError ? (
-            <h4>{creditsError}</h4>
-          ) : (
-            <ul>
-              {credits.map((actor) => (
-                <li key={actor.id}>{actor.name} as {actor.character}</li>
-              ))}
-            </ul>
-          )}
+          <ul>
+            {credits.cast.map((actor) => (
+              <li key={actor.id}>
+                {actor.name} as {actor.character}
+              </li>
+            ))}
+          </ul>
         </>
       ) : (
         <p>Waiting for movie details</p>

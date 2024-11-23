@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { useQuery } from 'react-query';
 import { Link } from 'react-router-dom';
 import { getTrendingMovies, getPopularMovies } from "../api/tmdb-api";
 import PageTemplate from '../components/templateMovieListPage';
@@ -6,36 +7,32 @@ import Spinner from '../components/spinner';
 import AddToFavoritesIcon from '../components/cardIcons/addToFavorites';
 
 const HomePage = (props) => {
-  const [trendingMovies, setTrendingMovies] = useState([]);
-  const [popularMovies, setPopularMovies] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  // 使用 React Query 获取 Trending Movies 数据
+  const { data: trendingMoviesData, error: trendingError, isLoading: isTrendingLoading } = useQuery(
+    'trendingMovies',
+    getTrendingMovies
+  );
 
-  useEffect(() => {
-    const fetchMovies = async () => {
-      try {
-        const trending = await getTrendingMovies();
-        setTrendingMovies(trending.results);
+  // 使用 React Query 获取 Popular Movies 数据
+  const { data: popularMoviesData, error: popularError, isLoading: isPopularLoading } = useQuery(
+    'popularMovies',
+    getPopularMovies
+  );
 
-        const popular = await getPopularMovies();
-        setPopularMovies(popular.results);
-
-        setLoading(false);
-      } catch (err) {
-        setError(err.message);
-        setLoading(false);
-      }
-    };
-    fetchMovies();
-  }, []);
-
-  if (loading) {
+  if (isTrendingLoading || isPopularLoading) {
     return <Spinner />;
   }
 
-  if (error) {
-    return <h1>{error}</h1>;
+  if (trendingError) {
+    return <h1>{trendingError.message}</h1>;
   }
+
+  if (popularError) {
+    return <h1>{popularError.message}</h1>;
+  }
+
+  const trendingMovies = trendingMoviesData.results;
+  const popularMovies = popularMoviesData.results;
 
   return (
     <>
