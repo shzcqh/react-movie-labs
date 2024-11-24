@@ -178,10 +178,41 @@ export const getMovieCredits = async (movieId) => {
     });
 };
 
-// 根据类型获取电影
+// Get movies based on genre
 export const getMoviesByGenre = async (genreId) => {
   return fetch(
     `https://api.themoviedb.org/3/discover/movie?api_key=${process.env.REACT_APP_TMDB_KEY}&with_genres=${genreId}`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.json().message);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+// Get the details of the actors
+export const getActorDetails = async (actorId) => {
+  return fetch(
+    `https://api.themoviedb.org/3/person/${actorId}?api_key=${process.env.REACT_APP_TMDB_KEY}&language=en-US`
+  )
+    .then((response) => {
+      if (!response.ok) {
+        throw new Error(response.json().message);
+      }
+      return response.json();
+    })
+    .catch((error) => {
+      throw error;
+    });
+};
+
+// Get movies with actors
+export const getActorMovies = async (actorId) => {
+  return fetch(
+    `https://api.themoviedb.org/3/person/${actorId}/movie_credits?api_key=${process.env.REACT_APP_TMDB_KEY}&language=en-US`
   )
     .then((response) => {
       if (!response.ok) {
