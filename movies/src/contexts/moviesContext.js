@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, createContext, useContext } from "react";
 
+export const useMovies = () => useContext(MoviesContext);
 export const MoviesContext = React.createContext(null);
 
 const MoviesContextProvider = (props) => {

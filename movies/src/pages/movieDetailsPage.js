@@ -5,10 +5,11 @@ import MovieDetails from '../components/movieDetails/';
 import PageTemplate from '../components/templateMoviePage';
 import { getMovie, getMovieRecommendations, getMovieCredits } from '../api/tmdb-api';
 import Spinner from '../components/spinner';
-
+import { useMovies } from '../contexts/moviesContext'; 
+ 
 const MoviePage = (props) => {
   const { id } = useParams();
-
+  const { addToFavorites } = useMovies(); 
   
   const { data: movie, error: movieError, isLoading: movieLoading } = useQuery(
     ['movie', { id }],
@@ -49,6 +50,7 @@ const MoviePage = (props) => {
         <>
           <PageTemplate movie={movie}>
             <MovieDetails movie={movie} />
+            <button onClick={() => addToFavorites(movie)}>Add to Favorites</button>
           </PageTemplate>
           
           <h3>Recommended Movies</h3>
