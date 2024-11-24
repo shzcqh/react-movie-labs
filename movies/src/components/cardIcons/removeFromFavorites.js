@@ -10,6 +10,7 @@ const RemoveFromFavoritesIcon = ({ movie }) => {
     e.preventDefault();
     context.removeFromFavorites(movie);
   };
+
   return (
     <IconButton
       aria-label="remove from favorites"
