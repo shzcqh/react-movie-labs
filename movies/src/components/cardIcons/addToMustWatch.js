@@ -1,19 +1,20 @@
-import React, { useContext } from "react";
-import { MoviesContext } from "../../contexts/moviesContext";
-import IconButton from "@mui/material/IconButton";
-import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
+import React, { useContext } from 'react';
+import { MoviesContext } from '../../contexts/moviesContext';
+import IconButton from '@mui/material/IconButton';
+import PlaylistAddIcon from '@mui/icons-material/PlaylistAdd';
 
 const AddToMustWatchIcon = ({ movie }) => {
-  const context = useContext(MoviesContext);
+  const { addToMustWatch } = useContext(MoviesContext);
 
   const handleAddToMustWatch = (e) => {
     e.preventDefault();
-    context.addToMustWatch(movie);
+    console.log("Adding movie to MustWatch:", movie); // 检查电影对象是否正确传递
+    addToMustWatch(movie); // Properly call context function to add movie to MustWatch list
   };
 
   return (
     <IconButton aria-label="add to must watch" onClick={handleAddToMustWatch}>
-      <PlaylistAddIcon color="primary" fontSize="large" />
+      <PlaylistAddIcon color="primary" />
     </IconButton>
   );
 };
